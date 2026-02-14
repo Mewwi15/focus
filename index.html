@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You ❤️</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #fff0f5;
+            --accent-color: #ff8fa3;
+            --text-color: #5d4037;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Mali', cursive;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(#ffccd5 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: var(--text-color);
+            overflow-x: hidden; /* ห้ามเลื่อนแนวนอน */
+        }
+
+        /* --- หน้าปก (Click to Enter) --- */
+        #welcome-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100vh;
+            background: #ffe6fa;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: opacity 0.5s;
+        }
+
+        .welcome-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Mali', cursive;
+            box-shadow: 0 5px 15px rgba(255, 143, 163, 0.5);
+            animation: pulse 1.5s infinite;
+            margin-top: 20px;
+        }
+
+        /* --- เนื้อหาหลัก --- */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            display: none; /* ซ่อนไว้ก่อน */
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        /* --- [แก้ไข] ปรับปรุงส่วนโพลารอยด์ --- */
+        .polaroid {
+            background: #fff;
+            padding: 25px 25px 50px 25px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            margin: 50px 0;
+            transform: rotate(-2deg);
+            border-radius: 8px;
+            text-align: center;
+        }
+        .polaroid:nth-child(even) { transform: rotate(2deg); }
+        
+        /* --- [แก้ไข] ทำให้รูปเล็กลง --- */
+        .polaroid img {
+            width: 85%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 4px;
+            display: block;
+            margin: 0 auto;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- [แก้ไข] ปรับคำบรรยายให้กว้างและชัดขึ้น --- */
+        .caption {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #777;
+            font-size: 1.15rem;
+            line-height: 1.5;
+            padding: 0 10px;
+        }
+
+        /* ข้อความบรรยายแทรก */
+        .story-text {
+            text-align: center;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin: 70px 20px;
+            color: #888;
+        }
+
+        /* มินิเกม */
+        .game-area {
+            background: #fff;
+            border: 3px dashed var(--accent-color);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin: 50px 0;
+        }
+        .heart-btn {
+            font-size: 80px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.1s;
+        }
+        .heart-btn:active { transform: scale(0.8); }
+        .progress-bar {
+            width: 100%; height: 15px; background: #eee;
+            border-radius: 10px; margin-top: 20px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; width: 0%; background: var(--accent-color); transition: width 0.2s;
+        }
+
+        /* ส่วนที่ซ่อนหลังเกม */
+        #locked-content { display: none; }
+
+        /* การ์ดนัดดูหนัง */
+        .movie-card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 50px;
+        }
+        .time-input {
+            padding: 10px;
+            border: 2px solid var(--accent-color);
+            border-radius: 20px;
+            text-align: center;
+            font-family: 'Mali', cursive;
+            width: 70%;
+            margin: 15px 0;
+        }
+        .btn-submit {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        /* ตั๋วผลลัพธ์ */
+        #final-ticket {
+            display: none;
+            border: 2px dashed #aaa;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            background: #fff;
+        }
+
+        /* ปุ่มเปิด/ปิดเพลงมุมจอ */
+        .music-ctrl {
+            position: fixed;
+            top: 20px; right: 20px;
+            background: #fff;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 100;
+            display: none; /* ซ่อนก่อนเข้าเว็บ */
+        }
+
+        @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
+    </style>
+</head>
+<body>
+
+    <div id="welcome-screen">
+        <h1 style="font-size: 3rem; color: #ff8fa3;">ถึงเด่กแมคคา 💌</h1>
+        <p>มีไรให้ดูจากเด่กคอมงับ...</p>
+        <button class="welcome-btn" onclick="enterSite()">แตะเพื่อเปิดดู ❤️</button>
+        <p style="margin-top: 10px; font-size: 0.8rem; color: #aaa;">(เปิดเสียงด้วยนะ 🎧)</p>
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="./img/music.mp3" type="audio/mpeg">
+    </audio>
+    
+    <div class="music-ctrl" onclick="toggleMusic()">
+        <i class="fas fa-volume-up" id="music-icon" style="color: #ff8fa3;"></i>
+    </div>
+
+    <div class="container" id="main-content">
+        
+        <div style="text-align: center; margin: 50px 0;">
+            <h2 data-aos="fade-down">พอดีไปดูไฮไลท์มาแล้วมันเท่ดี (มั้ง) 5555</h2>
+            <p>เลื่อนลงไปเรื่อยๆ นะ 👇</p>
+        </div>
+
+        <div class="polaroid" data-aos="fade-up">
+            <img src="./img/8.jpg">
+            <div class="caption">รูปนี้มันเฟี้ยวจังวะ ☁️</div>
+        </div>
+
+        <div class="story-text" data-aos="fade-in">
+            ถ้าเรียนแมคคามันยากก็ทักหาพี่คับน้อง<br>
+            เด่กคอมรับโจบบบ
+        </div>
+
+        <div class="polaroid" data-aos="fade-up">
+            <img src="./img/2.jpg">
+            <div class="caption">ขอไปอยู่ข้างหลังได้มั้ยล้า แอบข้างหลังก็ได้ อิอิ</div>
+        </div>
+
+        <div class="polaroid" data-aos="fade-up">
+            <img src="./img/3.jpg">
+            <div class="caption">ขอแมวได้มั้ยงับอ้วน ✨</div>
+        </div>
+
+        <div class="game-area" id="game-area" data-aos="zoom-in">
+            <h3>🔒 ภารกิจเติมหัวใจ</h3>
+            <p>กดใจมิวให้บี้ไปเลยดิ กดดดด...</p>
+            <div class="heart-btn" onclick="tapHeart()">❤️</div>
+            <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+        </div>
+
+        <div id="locked-content">
+            
+            <div class="story-text">
+                เอื้อออ <br>
+                ดูต่อกันเลย...
+            </div>
+
+            <div class="polaroid" data-aos="fade-up">
+                <img src="./img/4.jpg">
+                <div class="caption">ขอรอยยิ้มนี้ได้มั้ย 📸</div>
+            </div>
+
+            <div class="polaroid" data-aos="fade-up">
+                <img src="./img/5.jpg">
+                <div class="caption">ซอย 19 ดิวะ</div>
+            </div>
+
+            <div class="polaroid" data-aos="fade-up">
+                <img src="./img/6.jpg">
+                <div class="caption">อันนี้สวยจริง ดอกไม้ อะหยอกกก</div>
+            </div>
+
+            <div class="polaroid" data-aos="fade-up">
+                <img src="./img/7.jpg">
+                <div class="caption">หู้วววว</div>
+            </div>
+
+            <div class="movie-card" data-aos="flip-up">
+                <h2>🎬 ดูหนังกี่โมงงงง?</h2>
+                <img src="https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif" style="width: 150px; margin: 10px 0;">
+                <p>แบร่<br>ว่างวันไหน กี่โมง พิมพ์บอกเค้าหน่อย</p>
+                
+                <input type="text" id="date-input" class="time-input" placeholder="เช่น เสาร์นี้ บ่าย 2">
+                <br>
+                <button class="btn-submit" onclick="submitDate()">ตกลง (ส่งคำตอบ)</button>
+
+                <div id="final-ticket">
+                    <h3 style="color: #ff8fa3;">🎟️ MOVIE TICKET</h3>
+                    <p><b>Date With Me</b></p>
+                    <p id="ticket-time" style="font-size: 1.5rem; color: #555;">...</p>
+                    <p style="color: #999; font-size: 0.8rem;">(แคปหน้าจอนี้ส่งมาเลย! 📸)</p>
+                </div>
+            </div>
+            
+            <div style="height: 100px;"></div>
+        </div>
+
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        // เริ่ม Animation
+        AOS.init({ duration: 800, once: true });
+
+        // ฟังก์ชันเข้าเว็บ (กดปุ่มหน้าแรก)
+        function enterSite() {
+            // 1. เล่นเพลงทันที
+            const audio = document.getElementById('bgMusic');
+            
+            // --- [เพิ่มใหม่] ตั้งเวลาให้เริ่มที่วินาทีที่ 55 ---
+            audio.currentTime = 55; 
+            
+            audio.play().catch(e => console.log("Audio play failed", e));
+            audio.volume = 0.6;
+
+            // 2. ซ่อนหน้าปก แสดงเนื้อหา
+            document.getElementById('welcome-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('welcome-screen').style.display = 'none';
+                
+                const main = document.getElementById('main-content');
+                main.style.display = 'block';
+                // รอแป๊บให้ display block ทำงานก่อนค่อยปรับ opacity
+                setTimeout(() => main.style.opacity = '1', 50);
+                
+                // แสดงปุ่มเพลง
+                document.querySelector('.music-ctrl').style.display = 'flex';
+                
+                // รีเฟรช AOS
+                AOS.refresh();
+            }, 500);
+        }
+
+        // ระบบเกม
+        let clicks = 0;
+        const maxClicks = 10;
+        function tapHeart() {
+            if (clicks >= maxClicks) return;
+            clicks++;
+            document.getElementById('prog-fill').style.width = (clicks / maxClicks * 100) + '%';
+            
+            // Effect กด
+            const btn = document.querySelector('.heart-btn');
+            btn.style.transform = 'scale(0.8)';
+            setTimeout(() => btn.style.transform = 'scale(1)', 100);
+
+            if (clicks === maxClicks) {
+                // ผ่านด่าน
+                document.getElementById('locked-content').style.display = 'block';
+                document.getElementById('game-area').style.opacity = '0.5';
+                document.getElementById('game-area').style.pointerEvents = 'none';
+                // โปรยพลุนิดหน่อย
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+                AOS.refresh();
+            }
+        }
+
+        // ระบบจองตั๋ว
+        function submitDate() {
+            const val = document.getElementById('date-input').value;
+            if (!val) { alert("พิมพ์เวลาบอกก่อนสิครับ 🥺"); return; }
+            
+            document.getElementById('ticket-time').innerText = val;
+            document.getElementById('final-ticket').style.display = 'block';
+            
+            // จุดพลุใหญ่
+            confetti({ particleCount: 150, spread: 100, origin: { y: 0.8 } });
+            
+            // เปลี่ยนปุ่ม
+            document.querySelector('.btn-submit').innerText = "แคปหน้าจอเลย! 📸";
+        }
+
+        // เปิด/ปิดเพลง
+        function toggleMusic() {
+            const audio = document.getElementById('bgMusic');
+            const icon = document.getElementById('music-icon');
+            if (audio.paused) {
+                audio.play();
+                icon.className = "fas fa-volume-up";
+            } else {
+                audio.pause();
+                icon.className = "fas fa-volume-mute";
+            }
+        }
+    </script>
+</body>
+</html>
